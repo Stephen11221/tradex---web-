@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TradeX — Trading Dashboard</title>
+    <style>
+      :root {
+        --bg: #080b12;
+        --panel: #10151f;
+        --panel2: #151b27;
+        --line: #232b39;
+        --text: #f3f5f7;
+        --muted: #8c96a8;
+        --green: #21c77a;
+        --red: #ef5b68;
+        --blue: #4d8dff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          14px Inter,
+          Arial,
+          sans-serif;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        border-right: 1px solid var(--line);
+        padding: 22px 14px;
+        background: #0b0f17;
+      }
+      .logo {
+        font-size: 21px;
+        font-weight: 800;
+        padding: 0 12px 28px;
+      }
+      .logo span {
+        color: var(--green);
+      }
+      .nav {
+        display: grid;
+        gap: 7px;
+      }
+      .nav a {
+        text-decoration: none;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        text-align: left;
+        padding: 12px 14px;
+        border-radius: 9px;
+        cursor: pointer;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background: #151b26;
+        color: #fff;
+      }
+      .bottom {
+        margin-top: auto;
+        width: 190px;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 12px;
+      }
+      main {
+        min-width: 0;
+      }
+      .top {
+        height: 68px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+        background: #0b0f17;
+      }
+      .search {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 13px;
+        width: 270px;
+        color: white;
+        outline: none;
+      }
+      .user {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #34445f;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+      .content {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 350px);
+        gap: 18px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .marketbar {
+        display: flex;
+        gap: 28px;
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+        align-items: center;
+      }
+      .pair {
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .price {
+        font-size: 25px;
+        font-weight: 800;
+      }
+      .green {
+        color: var(--green);
+      }
+      .red {
+        color: var(--red);
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .tabs {
+        display: flex;
+        gap: 18px;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .tabs button {
+        background: none;
+        border: 0;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 5px;
+      }
+      .tabs button.active {
+        color: #fff;
+        border-bottom: 2px solid var(--blue);
+      }
+      .chart {
+        height: 420px;
+        position: relative;
+        padding: 16px;
+      }
+      .grid {
+        position: absolute;
+        inset: 16px;
+        background-image:
+          linear-gradient(#1c2330 1px, transparent 1px),
+          linear-gradient(90deg, #1c2330 1px, transparent 1px);
+        background-size: 20% 20%;
+        opacity: 0.65;
+      }
+      .chart svg {
+        position: absolute;
+        inset: 20px;
+        width: calc(100% - 40px);
+        height: calc(100% - 40px);
+      }
+      .chart-label {
+        position: absolute;
+        right: 10px;
+        top: 40%;
+        background: #18352b;
+        color: #73e5aa;
+        padding: 4px 7px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+      .orders {
+        padding: 16px;
+      }
+      .orders h3,
+      .panel h3 {
+        margin: 0 0 14px;
+      }
+      .order-tabs {
+        display: flex;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 15px;
+      }
+      .order-tabs button {
+        background: none;
+        border: 0;
+        color: var(--muted);
+        padding: 9px 0;
+        cursor: pointer;
+      }
+      .order-tabs .active {
+        color: #fff;
+        border-bottom: 2px solid var(--blue);
+      }
+      .form {
+        display: grid;
+        gap: 12px;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .input {
+        background: #0b1018;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 11px;
+        color: #fff;
+        width: 100%;
+        outline: none;
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .actions button {
+        padding: 12px;
+        border: 0;
+        border-radius: 7px;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .buy {
+        background: #168e59;
+      }
+      .sell {
+        background: #c63e4b;
+      }
+      .panel {
+        padding: 16px;
+      }
+      .watch {
+        display: grid;
+        gap: 3px;
+      }
+      .coin {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 6px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .coin:hover {
+        background: #161d29;
+      }
+      .coin b {
+        display: block;
+      }
+      .coin small:not(.green):not(.red) {
+        color: var(--muted);
+      }
+      .rightgrid {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+      }
+      .balance {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 5px 0;
+      }
+      .stat {
+        display: flex;
+        justify-content: space-between;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        background: #17202c;
+        border: 1px solid var(--line);
+        padding: 12px 15px;
+        border-radius: 8px;
+        display: none;
+      }
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 70px 1fr;
+        }
+        aside {
+          padding: 15px 8px;
+        }
+        .logo {
+          font-size: 0;
+          padding: 8px;
+        }
+        .logo span {
+          font-size: 22px;
+        }
+        .nav a {
+          text-decoration: none;
+          font-size: 10px;
+          text-align: center;
+          padding: 10px 0;
+        }
+        .nav-icon {
+          display: block;
+          font-size: 20px;
+        }
+        .bottom {
+          display: none;
+        }
+        .content {
+          grid-template-columns: 1fr;
+        }
+        .rightgrid {
+          display: grid;
+        }
+        .search {
+          width: 180px;
+        }
+      }
+      @media (max-width: 600px) {
+        .content {
+          padding: 10px;
+        }
+        .top {
+          padding: 0 10px;
+        }
+        .search {
+          width: 145px;
+        }
+        .marketbar {
+          gap: 12px;
+        }
+        .chart {
+          height: 330px;
+        }
+        .price {
+          font-size: 20px;
+        }
+      }
+
+      button,
+      a,
+      input {
+        touch-action: manipulation;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 3px;
+      }
+      .coin {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        text-align: left;
+        font: inherit;
+      }
+      .coin[aria-pressed="true"] {
+        background: var(--panel2);
+      }
+      .marketbar {
+        flex-wrap: wrap;
+      }
+      .form label {
+        display: grid;
+        gap: 7px;
+        color: var(--muted);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .chart-note {
+        padding: 0 16px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .stack {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        white-space: nowrap;
+      }
+      th,
+      td {
+        padding: 12px 8px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+      }
+      th {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .secondary {
+        background: var(--panel2);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 7px 10px;
+        cursor: pointer;
+      }
+      .empty {
+        color: var(--muted);
+        padding: 12px 0;
+      }
+      .align-right {
+        text-align: right;
+      }
+      .toast {
+        max-width: calc(100vw - 32px);
+        z-index: 10;
+      }
+      @media (max-width: 600px) {
+        .content {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .top {
+          gap: 8px;
+        }
+        .search {
+          width: 100%;
+          min-width: 0;
+        }
+        .user {
+          flex-shrink: 0;
+        }
+        .user .muted {
+          display: none;
+        }
+        .marketbar {
+          gap: 16px;
+        }
+        .stat {
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .balance {
+          font-size: 22px;
+        }
+      }
+
+      .account-select {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .account-select select {
+        background: var(--panel2);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px;
+      }
+      .account-banner {
+        margin: 20px 20px 0;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+      }
+      .account-banner p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
+      .feed-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .feed-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        background: var(--green);
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      button:disabled,
+      input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .chart svg {
+        overflow: hidden;
+      }
+      @media (max-width: 600px) {
+        .top {
+          height: auto;
+          min-height: 68px;
+          flex-wrap: wrap;
+          padding: 10px;
+        }
+        .top .search {
+          flex: 1 1 100%;
+        }
+        .top .user {
+          width: 100%;
+          justify-content: space-between;
+        }
+        .account-banner {
+          margin: 10px 10px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside>
+        <div class="logo">Trade<span>X</span></div>
+        <nav class="nav" aria-label="Main navigation">
+          <a class="active" href="#dashboard"
+            ><span class="nav-icon" aria-hidden="true">▣</span> Dashboard</a
+          >
+          <a href="#markets"
+            ><span class="nav-icon" aria-hidden="true">⌁</span> Markets</a
+          >
+          <a href="#trade"
+            ><span class="nav-icon" aria-hidden="true">↕</span> Trade</a
+          >
+          <a href="#orders"
+            ><span class="nav-icon" aria-hidden="true">◷</span> Orders</a
+          >
+          <a href="#portfolio"
+            ><span class="nav-icon" aria-hidden="true">▤</span> Portfolio</a
+          >
+          <a href="#settings"
+            ><span class="nav-icon" aria-hidden="true">⚙</span> Settings</a
+          >
+        </nav>
+        <div class="bottom">
+          <span id="sidebarAccount">Demo account</span><br /><b
+            style="color: #fff"
+            id="sidebarStatus"
+            >Paper Trading</b
+          >
+        </div>
+      </aside>
+      <main id="dashboard">
+        <header class="top">
+          <input
+            class="search"
+            type="search"
+            aria-label="Search markets"
+            placeholder="Search markets..."
+            id="search"
+          />
+          <div class="user">
+            <label class="account-select"
+              >Account
+              <select id="accountMode" aria-label="Trading account">
+                <option value="demo">Demo account</option>
+                <option value="real">Real account</option>
+              </select>
+            </label>
+            <div class="avatar">JM</div>
+          </div>
+        </header>
+        <section class="account-banner" aria-label="Account status">
+          <strong id="accountTitle">Demo account · Virtual funds</strong>
+          <p id="accountDescription">
+            Practice with simulated prices and virtual KES. No real money is
+            used.
+          </p>
+        </section>
+        <section class="content" aria-label="Trading dashboard">
+          <div class="stack">
+            <div class="card">
+              <div class="marketbar">
+                <div>
+                  <div class="pair" id="pair">BTC/KES</div>
+                  <div class="muted" id="marketName">Bitcoin</div>
+                </div>
+                <div>
+                  <div class="price" id="price">8,742,310</div>
+                  <div class="green" id="change">+2.84%</div>
+                </div>
+              </div>
+              <div class="tabs" aria-label="Chart timeframe">
+                <button class="active">1D</button><button>1W</button
+                ><button>1M</button><button>1Y</button>
+              </div>
+              <div class="feed-status">
+                <span
+                  ><span class="feed-dot" aria-hidden="true"></span
+                  ><span id="feedStatus">Simulated feed · Running</span></span
+                ><button
+                  class="secondary"
+                  id="pauseChart"
+                  type="button"
+                  aria-pressed="false"
+                >
+                  Pause
+                </button>
+              </div>
+              <div class="chart">
+                <div class="grid"></div>
+                <svg
+                  role="img"
+                  aria-label="Illustrative paper-trading price chart"
+                  viewBox="0 0 900 350"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="area" x1="0" x2="0" y1="0" y2="1">
+                      <stop
+                        stop-color="#4d8dff"
+                        offset="0"
+                        stop-opacity=".35"
+                      />
+                      <stop offset="1" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0 290 L55 260 L100 270 L145 220 L190 245 L240 180 L285 205 L330 145 L380 170 L425 110 L470 135 L515 90 L560 125 L605 70 L650 105 L700 55 L745 90 L795 45 L845 65 L900 35 L900 350 L0 350Z"
+                    fill="url(#area)"
+                  />
+                  <polyline
+                    points="0,290 55,260 100,270 145,220 190,245 240,180 285,205 330,145 380,170 425,110 470,135 515,90 560,125 605,70 650,105 700,55 745,90 795,45 845,65 900,35"
+                    fill="none"
+                    stroke="#4d8dff"
+                    stroke-width="3"
+                  />
+                </svg>
+                <div class="chart-label">8,742,310</div>
+              </div>
+              <p class="chart-note">
+                Continuously simulated prices · Not live market data
+              </p>
+              <div class="orders" id="trade">
+                <h3>Place order</h3>
+                <div class="order-tabs" aria-label="Order type">
+                  <button
+                    type="button"
+                    class="active"
+                    data-order-type="market"
+                    aria-pressed="true"
+                  >
+                    Market
+                  </button>
+                  <button
+                    type="button"
+                    data-order-type="limit"
+                    aria-pressed="false"
+                  >
+                    Limit
+                  </button>
+                </div>
+                <form class="form" id="orderForm">
+                  <div class="row">
+                    <span>Available cash</span><b id="available">KES 250,000</b>
+                  </div>
+                  <div class="row">
+                    <span>Available to sell</span><b id="holding"></b>
+                  </div>
+                  <label
+                    >Amount in KES<input
+                      class="input"
+                      id="amount"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      required
+                      value="10000"
+                  /></label>
+                  <label id="limitField" hidden
+                    >Limit price in KES<input
+                      class="input"
+                      id="limitPrice"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      disabled
+                  /></label>
+                  <div class="row">
+                    <span id="estimateLabel">Estimated BTC</span
+                    ><span id="estimate"></span>
+                  </div>
+                  <div class="actions">
+                    <button class="buy" type="submit" value="BUY">
+                      Buy BTC</button
+                    ><button class="sell" type="submit" value="SELL">
+                      Sell BTC
+                    </button>
+                  </div>
+                  <small class="muted"
+                    >Paper trading only. Open limit orders are checked against
+                    each simulated price update. Funds are checked again on
+                    execution; open orders do not reserve funds.</small
+                  >
+                </form>
+              </div>
+            </div>
+            <section
+              class="card panel"
+              id="orders"
+              aria-labelledby="ordersHeading"
+            >
+              <h3 id="ordersHeading">Orders</h3>
+              <p class="empty" id="ordersEmpty">
+                No orders yet. Your demo orders will appear here.
+              </p>
+              <div class="table-wrap">
+                <table id="orderTable" hidden>
+                  <thead>
+                    <tr>
+                      <th>Market</th>
+                      <th>Side / type</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orderRows"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+          <div class="rightgrid">
+            <section
+              class="card panel"
+              id="portfolio"
+              aria-labelledby="portfolioHeading"
+            >
+              <h3 id="portfolioHeading">Portfolio</h3>
+              <div class="balance" id="balance"></div>
+              <div class="muted" id="balanceLabel">Demo balance · KES</div>
+              <div id="positions"></div>
+            </section>
+            <section
+              class="card panel"
+              id="markets"
+              aria-labelledby="watchHeading"
+            >
+              <h3 id="watchHeading">Watchlist</h3>
+              <div class="watch" id="watch"></div>
+              <p class="empty" id="searchEmpty" hidden>
+                No markets match your search.
+              </p>
+            </section>
+            <section class="card panel" aria-labelledby="activityHeading">
+              <h3 id="activityHeading">Recent activity</h3>
+              <div id="activity">
+                <p class="empty">No trades this session.</p>
+              </div>
+            </section>
+            <section
+              class="card panel"
+              id="settings"
+              aria-labelledby="settingsHeading"
+            >
+              <h3 id="settingsHeading">Settings</h3>
+              <p class="muted">
+                This demo uses KES and sample prices. Balances and orders last
+                until you reload the page.
+              </p>
+              <button type="button" class="secondary" id="resetDemo">
+                Reset demo account
+              </button>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script>
+      // Sample market data for this standalone paper-trading demo.
+      const markets = [
+        { symbol: "BTC", name: "Bitcoin", price: 8742310, change: "+2.84%" },
+        { symbol: "ETH", name: "Ethereum", price: 486250, change: "+1.32%" },
+        { symbol: "SOL", name: "Solana", price: 22640, change: "-0.84%" },
+        { symbol: "USDT", name: "Tether", price: 129.4, change: "+0.08%" },
+        { symbol: "XRP", name: "XRP", price: 342.8, change: "-1.18%" },
+      ];
+      const $ = (id) => document.getElementById(id);
+      const money = (value) =>
+        value.toLocaleString("en-KE", { maximumFractionDigits: 2 });
+      let selected = 0;
+      let orderType = "market";
+      let cash = 250000;
+      let holdings = initialHoldings();
+      let orders = [];
+      let toastTimer;
+      let accountMode = "demo";
+      let paused = false;
+      let timeframe = 0;
+      const sampleCounts = [40, 60, 90, 120];
+      const tickDuration = 1000;
+      let lastTick = performance.now();
+      // Every series is synthetic and bounded in memory; no network prices are used.
+      markets.forEach((market) => {
+        market.open = market.price / (1 + parseFloat(market.change) / 100);
+        market.history = Array.from(
+          { length: 121 },
+          (_, index) =>
+            market.price *
+            (1 + Math.sin(index * 0.55) * 0.004 + (index - 120) * 0.00008),
+        );
+        market.history[120] = market.price;
+        market.target = nextPrice(market.price);
+      });
+
+      function nextPrice(price) {
+        return Math.max(0.01, price * (1 + (Math.random() - 0.5) * 0.002));
+      }
+
+      function drawChart(progress = 0) {
+        const market = markets[selected];
+        const count = sampleCounts[timeframe];
+        const values = market.history.slice(-count);
+        const current =
+          market.price + (market.target - market.price) * progress;
+        const all = [...values, market.target];
+        const min = Math.min(...all);
+        const range = Math.max(Math.max(...all) - min, market.price * 0.002);
+        const y = (value) => 310 - ((value - min) / range) * 270;
+        const step = 900 / (count - 1);
+        const points = values.map((value, index) => [
+          index * step - progress * step,
+          y(value),
+        ]);
+        points.push([900, y(current)]);
+        document
+          .querySelector(".chart polyline")
+          .setAttribute(
+            "points",
+            points.map((point) => point.join(",")).join(" "),
+          );
+        document
+          .querySelector(".chart path")
+          .setAttribute(
+            "d",
+            `M${points.map((point) => point.join(" ")).join(" L")} L900 350 L0 350Z`,
+          );
+        const label = document.querySelector(".chart-label");
+        label.textContent = money(current);
+        label.style.top = `${20 + (y(current) / 350) * (document.querySelector(".chart").clientHeight - 40)}px`;
+      }
+
+      function processOpenOrders() {
+        let changed = false;
+        // Earlier orders get priority when several orders reach their limits together.
+        [...orders].reverse().forEach((order) => {
+          if (order.status !== "Open") return;
+          const market = markets.find((item) => item.symbol === order.symbol);
+          if (
+            !(order.side === "BUY"
+              ? market.price <= order.limit
+              : market.price >= order.limit)
+          )
+            return;
+          const quantity = order.amount / market.price;
+          const funded =
+            order.side === "BUY"
+              ? cash >= order.amount
+              : (holdings[order.symbol] || 0) >= quantity;
+          order.status = funded ? "Filled" : "Rejected";
+          if (funded) {
+            cash += order.side === "BUY" ? -order.amount : order.amount;
+            holdings[order.symbol] =
+              (holdings[order.symbol] || 0) +
+              (order.side === "BUY" ? quantity : -quantity);
+          }
+          changed = true;
+        });
+        if (changed) renderOrders();
+      }
+
+      function advancePrices() {
+        markets.forEach((market) => {
+          market.price = market.target;
+          market.history.push(market.price);
+          market.history.shift();
+          market.target = nextPrice(market.price);
+          const change = (market.price / market.open - 1) * 100;
+          market.change = `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+        });
+        const market = markets[selected];
+        $("price").textContent = money(market.price);
+        $("change").textContent = market.change;
+        $("change").className = market.change.startsWith("-") ? "red" : "green";
+        // Update existing buttons so keyboard focus survives a price tick.
+        document.querySelectorAll("#watch .coin").forEach((button) => {
+          const item = markets[Number(button.dataset.market)];
+          button.querySelector(".align-right b").textContent = money(
+            item.price,
+          );
+          const change = button.querySelector(".align-right small");
+          change.textContent = item.change;
+          change.className = item.change.startsWith("-") ? "red" : "green";
+        });
+        processOpenOrders();
+        renderAccount();
+      }
+
+      function animateChart(now) {
+        if (!paused && !document.hidden) {
+          if (now - lastTick >= tickDuration) {
+            advancePrices();
+            lastTick = now;
+          }
+          drawChart(Math.min((now - lastTick) / tickDuration, 1));
+        } else {
+          lastTick = now;
+        }
+        requestAnimationFrame(animateChart);
+      }
+
+      function switchAccount(mode) {
+        accountMode = mode;
+        const real = mode === "real";
+        $("accountTitle").textContent = real
+          ? "Real account · Not connected"
+          : "Demo account · Virtual funds";
+        $("accountDescription").textContent = real
+          ? "Connect a supported broker through a secure backend to load real balances and place trades. This page currently shows simulated prices only."
+          : "Practice with simulated prices and virtual KES. No real money is used.";
+        $("sidebarAccount").textContent = real
+          ? "Real account"
+          : "Demo account";
+        $("sidebarStatus").textContent = real
+          ? "Not connected"
+          : "Paper Trading";
+        $("balanceLabel").textContent = real
+          ? "Broker connection required"
+          : "Demo balance · KES";
+        document
+          .querySelectorAll(
+            "#orderForm input, #orderForm button, [data-order-type]",
+          )
+          .forEach((control) => {
+            control.disabled = real;
+          });
+        $("limitPrice").disabled = real || orderType !== "limit";
+        $("resetDemo").disabled = real;
+        renderAccount();
+        renderOrders();
+      }
+
+      function initialHoldings() {
+        return {
+          BTC: 734120 / markets[0].price,
+          ETH: 300400 / markets[1].price,
+        };
+      }
+
+      function notify(message) {
+        clearTimeout(toastTimer);
+        $("toast").textContent = message;
+        $("toast").style.display = "block";
+        toastTimer = setTimeout(() => {
+          $("toast").style.display = "none";
+        }, 4000);
+      }
+
+      function renderWatchlist() {
+        const query = $("search").value.trim().toLowerCase();
+        $("watch").replaceChildren();
+        markets.forEach((market, index) => {
+          if (
+            !`${market.symbol}/KES ${market.name}`.toLowerCase().includes(query)
+          )
+            return;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.dataset.market = index;
+          button.className = "coin";
+          button.setAttribute("aria-pressed", String(index === selected));
+          button.innerHTML = `<span><b>${market.symbol}/KES</b><small>${market.name}</small></span>
+          <span class="align-right"><b>${money(market.price)}</b><small class="${market.change.startsWith("-") ? "red" : "green"}">${market.change}</small></span>`;
+          button.addEventListener("click", () => selectMarket(index));
+          $("watch").append(button);
+        });
+        $("searchEmpty").hidden = $("watch").children.length > 0;
+      }
+
+      function selectMarket(index) {
+        selected = index;
+        const market = markets[index];
+        $("pair").textContent = `${market.symbol}/KES`;
+        $("marketName").textContent = market.name;
+        $("price").textContent = money(market.price);
+        $("change").textContent = market.change;
+        $("change").className = market.change.startsWith("-") ? "red" : "green";
+        document.querySelector(".chart-label").textContent = money(
+          market.price,
+        );
+        document.querySelector(".buy").textContent = `Buy ${market.symbol}`;
+        document.querySelector(".sell").textContent = `Sell ${market.symbol}`;
+        $("limitPrice").value = market.price.toFixed(2);
+        drawChart();
+        renderWatchlist();
+        updateEstimate();
+      }
+
+      function updateEstimate() {
+        if (accountMode === "real") {
+          $("estimate").textContent = "—";
+          $("holding").textContent = "Not connected";
+          $("estimateLabel").textContent =
+            `Estimated ${markets[selected].symbol}`;
+          return;
+        }
+        const market = markets[selected];
+        const price =
+          orderType === "limit" ? Number($("limitPrice").value) : market.price;
+        const amount = Number($("amount").value);
+        $("estimateLabel").textContent = `Estimated ${market.symbol}`;
+        $("estimate").textContent =
+          Number.isFinite(amount / price) && amount > 0 && price > 0
+            ? `${(amount / price).toFixed(8)} ${market.symbol}`
+            : "—";
+        $("holding").textContent =
+          `${(holdings[market.symbol] || 0).toFixed(8)} ${market.symbol}`;
+      }
+
+      function renderAccount() {
+        if (accountMode === "real") {
+          $("balance").textContent = "Not connected";
+          $("available").textContent = "Unavailable";
+          $("positions").replaceChildren();
+          updateEstimate();
+          return;
+        }
+        const total =
+          cash +
+          markets.reduce(
+            (sum, market) =>
+              sum + (holdings[market.symbol] || 0) * market.price,
+            0,
+          );
+        $("balance").textContent = `KES ${money(total)}`;
+        $("available").textContent = `KES ${money(cash)}`;
+        $("positions").innerHTML =
+          `<div class="stat"><span>Cash</span><b>KES ${money(cash)}</b></div>` +
+          markets
+            .filter((market) => holdings[market.symbol] > 0)
+            .map(
+              (market) =>
+                `<div class="stat"><span>${market.symbol}</span><b>KES ${money(holdings[market.symbol] * market.price)}</b></div>`,
+            )
+            .join("");
+        updateEstimate();
+      }
+
+      function renderOrders() {
+        if (accountMode === "real") {
+          $("ordersEmpty").hidden = false;
+          $("ordersEmpty").textContent =
+            "Connect a broker to view real orders.";
+          $("orderTable").hidden = true;
+          $("orderRows").replaceChildren();
+          $("activity").innerHTML =
+            '<p class="empty">No real account connected.</p>';
+          return;
+        }
+        $("ordersEmpty").textContent =
+          "No orders yet. Your demo orders will appear here.";
+        $("ordersEmpty").hidden = orders.length > 0;
+        $("orderTable").hidden = orders.length === 0;
+        $("orderRows").innerHTML = orders
+          .map(
+            (order, index) =>
+              `<tr><td>${order.symbol}/KES</td><td>${order.side} / ${order.type}</td>
+          <td>KES ${money(order.amount)}${order.type === "limit" ? `<br><small>Limit: KES ${money(order.limit)}</small>` : ""}</td><td>${order.status}</td>
+          <td>${order.status === "Open" ? `<button class="secondary" type="button" data-cancel="${index}">Cancel</button>` : "—"}</td></tr>`,
+          )
+          .join("");
+        const filled = orders
+          .filter((order) => order.status === "Filled")
+          .slice(0, 5);
+        $("activity").innerHTML = filled.length
+          ? filled
+              .map(
+                (order) =>
+                  `<div class="stat"><span>${order.symbol} ${order.side}</span><span>KES ${money(order.amount)}</span></div>`,
+              )
+              .join("")
+          : '<p class="empty">No trades this session.</p>';
+      }
+
+      $("orderForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        if (accountMode !== "demo")
+          return notify("Connect a broker before placing real orders.");
+        const side = event.submitter?.value || "BUY";
+        const market = markets[selected];
+        const amount = Number($("amount").value);
+        const limit = Number($("limitPrice").value);
+        if (
+          !Number.isFinite(amount) ||
+          amount <= 0 ||
+          (orderType === "limit" && (!Number.isFinite(limit) || limit <= 0))
+        ) {
+          notify("Enter a valid positive amount and price.");
+          return;
+        }
+        const fills =
+          orderType === "market" ||
+          (side === "BUY" ? market.price <= limit : market.price >= limit);
+        const quantity = amount / (fills ? market.price : limit);
+        if (side === "BUY" && amount > cash)
+          return notify("Insufficient demo cash for this order.");
+        if (side === "SELL" && quantity > (holdings[market.symbol] || 0))
+          return notify(`Insufficient ${market.symbol} to sell.`);
+        if (fills) {
+          cash += side === "BUY" ? -amount : amount;
+          holdings[market.symbol] =
+            (holdings[market.symbol] || 0) +
+            (side === "BUY" ? quantity : -quantity);
+        }
+        orders.unshift({
+          symbol: market.symbol,
+          side,
+          type: orderType,
+          amount,
+          limit,
+          status: fills ? "Filled" : "Open",
+        });
+        renderAccount();
+        renderOrders();
+        notify(
+          fills
+            ? `${side} demo order filled for KES ${money(amount)}.`
+            : "Demo limit order added to open orders.",
+        );
+      });
+
+      $("orderRows").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-cancel]");
+        if (!button || accountMode !== "demo") return;
+        orders[Number(button.dataset.cancel)].status = "Cancelled";
+        renderOrders();
+        notify("Demo order cancelled.");
+      });
+
+      document.querySelectorAll("[data-order-type]").forEach((button) => {
+        button.addEventListener("click", () => {
+          orderType = button.dataset.orderType;
+          document.querySelectorAll("[data-order-type]").forEach((tab) => {
+            tab.classList.toggle("active", tab === button);
+            tab.setAttribute("aria-pressed", String(tab === button));
+          });
+          $("limitField").hidden = orderType !== "limit";
+          $("limitPrice").disabled = orderType !== "limit";
+          $("limitPrice").required = orderType === "limit";
+          updateEstimate();
+        });
+      });
+
+      // Timeframe buttons adjust the visible simulated sample window.
+      document.querySelectorAll(".tabs button").forEach((button, index) => {
+        button.setAttribute("aria-pressed", String(index === 0));
+        button.addEventListener("click", () => {
+          timeframe = index;
+          document.querySelectorAll(".tabs button").forEach((tab) => {
+            tab.classList.toggle("active", tab === button);
+            tab.setAttribute("aria-pressed", String(tab === button));
+          });
+          document.querySelector(".chart-note").textContent =
+            `${button.textContent} simulated view · Not historical or live market data`;
+          drawChart();
+        });
+      });
+      $("accountMode").addEventListener("change", (event) =>
+        switchAccount(event.target.value),
+      );
+      $("pauseChart").addEventListener("click", () => {
+        paused = !paused;
+        lastTick = performance.now();
+        $("pauseChart").textContent = paused ? "Resume" : "Pause";
+        $("pauseChart").setAttribute("aria-pressed", String(paused));
+        $("feedStatus").textContent = paused
+          ? "Simulated feed · Paused"
+          : "Simulated feed · Running";
+      });
+      document.addEventListener("visibilitychange", () => {
+        lastTick = performance.now();
+      });
+
+      document.querySelectorAll(".nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          document
+            .querySelectorAll(".nav a")
+            .forEach((item) => item.classList.toggle("active", item === link));
+        });
+      });
+      $("resetDemo").addEventListener("click", () => {
+        if (
+          !window.confirm(
+            "Reset all demo balances and clear this session’s orders?",
+          )
+        )
+          return;
+        cash = 250000;
+        holdings = initialHoldings();
+        orders = [];
+        renderAccount();
+        renderOrders();
+        notify("Demo account reset.");
+      });
+      $("search").addEventListener("input", renderWatchlist);
+      $("amount").addEventListener("input", updateEstimate);
+      $("limitPrice").addEventListener("input", updateEstimate);
+      selectMarket(0);
+      renderAccount();
+      renderOrders();
+      requestAnimationFrame(animateChart);
+    </script>
+  </body>
+</html>
